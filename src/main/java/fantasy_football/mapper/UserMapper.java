@@ -11,6 +11,8 @@ public interface UserMapper {
 
     String GET_BY_ID = ("SELECT * FROM FantasyDraft.users WHERE email = #{email}");
 
+    String VERIFY_KEY = ("SELECT * FROM FantasyDraft.users WHERE apiKey = #{apiKey}");
+
     String UPDATE_USER = ("UPDATE FantasyDraft.users " +
             "SET firstName=#{firstName}, lastName=#{lastName}, email=#{email}, apiKey=#{apiKey} " +
             "WHERE email=#{email}");
@@ -27,4 +29,7 @@ public interface UserMapper {
 
     @Insert(ADD_USER)
     public int addUser(User user);
+
+    @Select(VERIFY_KEY)
+    public boolean verifyKey(String apiKey);
 }

@@ -2,8 +2,9 @@ package fantasy_football.controller;
 
 import fantasy_football.model.PlayerTeam;
 import fantasy_football.model.User;
-import fantasy_football.service.AuthService;
+import fantasy_football.service.UserService;
 import fantasy_football.service.FantasyService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,72 +16,68 @@ public class Controller {
     FantasyService fantasyService;
 
     @Autowired
-    AuthService authService;
+    UserService userService;
 
     /**
-     * GET request that runs a SELECT query (Read)
+     * FantasyFootball: GET request that runs a SELECT query (Read)
      *
      * @param id integer to specify object id
      * @return the PlayerTeam object with that id
      */
     @RequestMapping(method = RequestMethod.GET, value = "/")
-    public PlayerTeam getById(@RequestParam(value="api") String apiKey,
+    public PlayerTeam getById(@RequestParam(value = "api") String apiKey,
                               @RequestParam(value = "id") int id) {
+//        if(userService.verifyAPI(apiKey)){
         return fantasyService.getByID(id);
+//    }
+//        else {
+//            throw UnauthenticatedUserException
+//        }
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/api")
-    public User requestApiKey(@RequestBody User user) {
-        return authService.requestApiKey(user);
-    }
-
+    /**
+     * Users: GET request that runs a SELECT query (Read)
+     *
+     * @param email User's email address (*
+     * @return
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/user")
-    public User getByEmail(@RequestParam(value="email") String email) {
-        return authService.getByEmail(email);
+    public User getByEmail(@RequestParam(value = "email") String email) {
+        return userService.getByEmail(email);
     }
 
+    /**
+     * Users:  POST request runs an INSERT query (Create)
+     *
+     * @param user User object. Must contain a unique email at a minimum
+     * @return the User object if successful
+     */
     @RequestMapping(method = RequestMethod.POST, value = "/user")
     public User addUser(@RequestBody User user) {
-        return authService.addUser(user);
+        return userService.addUser(user);
     }
 
+    /**
+     * Users: PATCH request runs an UPDATE query (Update)
+     *
+     * @param user User object. Must contain a unique email at a minimum
+     * @return the User object if successful
+     */
     @RequestMapping(method = RequestMethod.PATCH, value = "/user")
     public User updateUser(@RequestBody User user) {
-        return authService.updateUser(user);
+        return userService.updateUser(user);
     }
 
-// Can I add to 2 different tables from 1 request? Probably
-//    /**
-//     * POST request that runs an INSERT query (Create)
-//     *
-//     * @param entry as DigitalCurrencyDaily object in the body of the POST request.
-//     * @return the new added DigitalCurrencyDaily object
-//     */
-//    @RequestMapping(method = RequestMethod.POST, value = "/")
-//    public DigitalCurrencyDaily addNew(@RequestBody DigitalCurrencyDaily entry) {
-//        return digitalDailyService.addNew(entry);
-//    }
+    /**
+     * Users: POST request to request a unique API key for the user.
+     *
+     * @param user User object. Must contain a unique email at a minimum
+     * @return the User object with the new API key, or with their existing
+     *      API key if they already had one.
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/api")
+    public User requestApiKey(@RequestBody User user) {
+        return userService.requestApiKey(user);
+    }
 
-//    /**
-//     * PATCH request that runs a UPDATE query (Update)
-//     *
-//     * @param entry as DigitalCurrencyDaily object in the body of the PATCH request.
-//     * @return the DigitalCurrencyDaily object with that id
-//     */
-//    @RequestMapping(method = RequestMethod.PATCH, value = "/")
-//    public DigitalCurrencyDaily updateById(@RequestBody DigitalCurrencyDaily entry) {
-//        return digitalDailyService.updateById(entry);
-//    }
-//
-//    /**
-//     * DELETE request that runs a UPDATE query to set as inactive (Delete)
-//     *
-//     * @param id integer to specify object id
-//     * @return the deactivated DigitalCurrencyDaily object with that id
-//     */
-//    @RequestMapping(method = RequestMethod.DELETE, value = "/")
-//    public DigitalCurrencyDaily deleteById(@RequestParam(value = "id") int id) {
-//        return digitalDailyService.deleteByID(id);
-//    }
-//
 }
