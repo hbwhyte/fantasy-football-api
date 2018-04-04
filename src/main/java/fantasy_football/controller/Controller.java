@@ -1,6 +1,8 @@
 package fantasy_football.controller;
 
 import fantasy_football.model.PlayerTeam;
+import fantasy_football.model.User;
+import fantasy_football.service.AuthService;
 import fantasy_football.service.FantasyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,9 @@ public class Controller {
     @Autowired
     FantasyService fantasyService;
 
+    @Autowired
+    AuthService authService;
+
     /**
      * GET request that runs a SELECT query (Read)
      *
@@ -22,6 +27,26 @@ public class Controller {
     public PlayerTeam getById(@RequestParam(value="api") String apiKey,
                               @RequestParam(value = "id") int id) {
         return fantasyService.getByID(id);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/api")
+    public User requestApiKey(@RequestBody User user) {
+        return authService.requestApiKey(user);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/user")
+    public User getByEmail(@RequestParam(value="email") String email) {
+        return authService.getByEmail(email);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/user")
+    public User addUser(@RequestBody User user) {
+        return authService.addUser(user);
+    }
+
+    @RequestMapping(method = RequestMethod.PATCH, value = "/user")
+    public User updateUser(@RequestBody User user) {
+        return authService.updateUser(user);
     }
 
 // Can I add to 2 different tables from 1 request? Probably

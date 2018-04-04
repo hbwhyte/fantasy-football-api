@@ -3,7 +3,9 @@ package fantasy_football.service;
 import fantasy_football.mapper.FantasyMapper;
 import fantasy_football.model.PlayerTeam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class FantasyService {
 
     @Autowired
