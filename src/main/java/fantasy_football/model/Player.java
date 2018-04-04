@@ -1,3 +1,5 @@
+package fantasy_football.model;
+
 public class Player {
 
     private int playerID;

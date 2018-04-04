@@ -1,3 +1,7 @@
+import fantasy_football.model.Player;
+import fantasy_football.model.PlayerTeam;
+import fantasy_football.model.Team;
+
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -19,7 +23,7 @@ public class FantasyDraft {
         //fantasy.deletePlayer(13); // by player ID or first and last name
         //fantasy.matchPlayer(10,22); // Matches Dan Bailey to the Denver Broncos
 
-        // Team draft of only matched players
+        // fantasy_football.model.Team draft of only matched players
         fantasy.draftTeam();
     }
 
@@ -194,10 +198,10 @@ public class FantasyDraft {
         preparedStatement.executeUpdate();
 //        resultSet = statement.executeQuery("select * from players_teams");
 //
-//        ArrayList<PlayerTeam> playerteam = mapPlayersTeamsToObjects(resultSet);
+//        ArrayList<fantasy_football.model.PlayerTeam> playerteam = mapPlayersTeamsToObjects(resultSet);
 //
 //        System.out.println("\nMY DRAFT");
-//        for (PlayerTeam pt : playerteam) {
+//        for (fantasy_football.model.PlayerTeam pt : playerteam) {
 //            System.out.println(pt.toString());
 //        }
 
