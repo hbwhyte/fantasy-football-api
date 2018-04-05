@@ -1,6 +1,10 @@
 package fantasy_football.exceptions;
 
-public class DatabaseException extends RuntimeException {
+public class DatabaseException extends Exception {
+
+
+    public DatabaseException() {
+    }
 
     public DatabaseException(String message) {
         super(message);
@@ -8,6 +12,6 @@ public class DatabaseException extends RuntimeException {
 
     @Override
     public String toString() {
-        return "DatabaseException{}";
+        return "Database Exception";
     }
 }
