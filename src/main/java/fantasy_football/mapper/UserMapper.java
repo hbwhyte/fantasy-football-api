@@ -31,5 +31,5 @@ public interface UserMapper {
     public int addUser(User user);
 
     @Select(VERIFY_KEY)
-    public boolean verifyKey(String apiKey);
+    public User verifyKey(String apiKey);
 }

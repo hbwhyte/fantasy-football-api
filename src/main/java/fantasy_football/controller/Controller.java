@@ -1,5 +1,6 @@
 package fantasy_football.controller;
 
+import fantasy_football.exceptions.UnauthenticatedUserException;
 import fantasy_football.model.PlayerTeam;
 import fantasy_football.model.User;
 import fantasy_football.service.UserService;
@@ -26,13 +27,13 @@ public class Controller {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/")
     public PlayerTeam getById(@RequestParam(value = "api") String apiKey,
-                              @RequestParam(value = "id") int id) {
-//        if(userService.verifyAPI(apiKey)){
+                              @RequestParam(value = "id", defaultValue = "1") int id) throws UnauthenticatedUserException {
+        if(userService.verifyAPI(apiKey)){
         return fantasyService.getByID(id);
-//    }
-//        else {
-//            throw UnauthenticatedUserException
-//        }
+    }
+        else {
+            throw new UnauthenticatedUserException("That is not a valid API Key");
+        }
     }
 
     /**

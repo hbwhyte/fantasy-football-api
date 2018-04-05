@@ -112,9 +112,17 @@ public class UserService {
         return DatatypeConverter.printHexBinary(encoded).toLowerCase();
     }
 
-    public void verifyAPI(String apiKey) {
-        if(userMapper.verifyKey(apiKey) {
-
+    /**
+     * Checks if an API key exists in the database.
+     *
+     * @param apiKey String of a unique API Key
+     * @return boolean true if the key exists
+     */
+    public boolean verifyAPI(String apiKey) {
+        if(userMapper.verifyKey(apiKey) == null) {
+            return false;
+        } else {
+            return true;
         }
     }
 }
