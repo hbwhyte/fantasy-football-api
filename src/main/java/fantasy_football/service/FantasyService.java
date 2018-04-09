@@ -20,14 +20,12 @@ public class FantasyService {
      * @param id integer of object to be returned
      * @return DigitalCurrencyDaily object of the entry by id
      */
-    public GeneralResponse getByID(int id) throws DatabaseException {
+    public PlayerTeam getByID(int id) throws DatabaseException {
         PlayerTeam pt = null;
         try {
             pt = fantasyMapper.getByID(id);
             if (pt != null) {
-                GeneralResponse gr = new GeneralResponse();
-                gr.setData(pt);
-                return gr;
+                return pt;
             } else {
                 throw new DatabaseException("ID does not match any players in the database.");
             }

@@ -12,6 +12,13 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @ControllerAdvice
 public class ControllerAdviceClass {
 
+    /**
+     * If the user tries a path or page that does not exist,
+     * returns this exception message.
+     *
+     * @param e NoHandlerFoundException
+     * @return GeneralResponse with a failed 404 message
+     */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({NoHandlerFoundException.class})
     public @ResponseBody
@@ -28,10 +35,18 @@ public class ControllerAdviceClass {
         return gr;
     }
 
+    /**
+     * If the user tries an incompatible, unmapped, or not allowed
+     * HTTP request, returns this exception message. For example,
+     * trying to POST to a path that only accepts GET requests.
+     *
+     * @param e HttpRequestMethodNotSupportedException
+     * @return GeneralResponse with a failed 405 message
+     */
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
     public @ResponseBody
-    GeneralResponse handle404(HttpRequestMethodNotSupportedException e) {
+    GeneralResponse handle405(HttpRequestMethodNotSupportedException e) {
         GeneralResponse gr = new GeneralResponse();
         gr.setStatus("Fail");
         gr.setResponse_code(HttpStatus.NOT_FOUND);
@@ -43,6 +58,29 @@ public class ControllerAdviceClass {
         return gr;
     }
 
+    /**
+     *  If the user exceeds their API call limit, returns this exception message.
+     *
+     * @param e CallsExceededException
+     * @return GeneralResponse with a failed 429 message
+     */
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    @ExceptionHandler({CallsExceededException.class})
+    public @ResponseBody GeneralResponse handle429(CallsExceededException e) {
+        GeneralResponse gr = new GeneralResponse();
+        gr.setStatus("Fail");
+        gr.setResponse_code(HttpStatus.TOO_MANY_REQUESTS);
+        gr.setError(generateCustomEx(e));
+        return gr;
+    }
+
+    /**
+     * If the user does not include required request parameters in their
+     * HTTP request, returns this exception message.
+     *
+     * @param e MissingServletRequestParameterException
+     * @return GeneralResponse with a failed 400 message
+     */
     @ExceptionHandler({MissingServletRequestParameterException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody
@@ -58,6 +96,14 @@ public class ControllerAdviceClass {
         return gr;
     }
 
+    /**
+     * If the user includes unreadable JSON to in their HTTP
+     * request, returns this exception message. For example, one
+     * sided quotes in their POST RequestBody.
+     *
+     * @param e HttpMessageNotReadableException
+     * @return GeneralResponse with a failed 400 message
+     */
     @ExceptionHandler({HttpMessageNotReadableException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody
@@ -73,33 +119,54 @@ public class ControllerAdviceClass {
         return gr;
     }
 
+    /**
+     * If the API Key provided is not found in the database, returns this
+     * exception message.
+     *
+     * @param e UnauthenticatedUserException
+     * @return General Response with a failed 401 message
+     */
     @ResponseBody
     @ExceptionHandler(UnauthenticatedUserException.class)
-    public GeneralResponse badApiError(UnauthenticatedUserException ex) {
+    public GeneralResponse badApiError(UnauthenticatedUserException e) {
         GeneralResponse gr = new GeneralResponse();
         gr.setStatus("Fail");
         gr.setResponse_code(HttpStatus.UNAUTHORIZED);
-        gr.setError(generateCustomEx(ex));
+        gr.setError(generateCustomEx(e));
         return gr;
     }
 
+    /**
+     * If the user requested is not found in the database, returns this
+     * exception message.
+     *
+     * @param e DatabaseException
+     * @return General Response with a failed 404 message
+     */
     @ResponseBody
     @ExceptionHandler(DatabaseException.class)
-    public GeneralResponse getUserError(DatabaseException ex) {
+    public GeneralResponse getUserError(DatabaseException e) {
         GeneralResponse gr = new GeneralResponse();
         gr.setStatus("Fail");
         gr.setResponse_code(HttpStatus.NOT_FOUND);
-        gr.setError(generateCustomEx(ex));
+        gr.setError(generateCustomEx(e));
         return gr;
     }
 
+    /**
+     * If the API key could not be generated for the user, returns
+     * this exception message.
+     *
+     * @param e DatabaseException
+     * @return General Response with a failed 503 message
+     */
     @ResponseBody
     @ExceptionHandler(APIGenerationException.class)
-    public GeneralResponse apiGenerationError(DatabaseException ex) {
+    public GeneralResponse apiGenerationError(DatabaseException e) {
         GeneralResponse gr = new GeneralResponse();
         gr.setStatus("Fail");
         gr.setResponse_code(HttpStatus.SERVICE_UNAVAILABLE);
-        gr.setError(generateCustomEx(ex));
+        gr.setError(generateCustomEx(e));
         return gr;
     }
 
@@ -107,13 +174,13 @@ public class ControllerAdviceClass {
      * Generates a nicely formatted Custom Exception response
      * for JSON output.
      *
-     * @param ex Any exception to be formatted
+     * @param e Any exception to be formatted
      * @return CustomException Object
      */
-    public CustomException generateCustomEx(Exception ex) {
+    public CustomException generateCustomEx(Exception e) {
         CustomException c = new CustomException();
-        c.setErrorName(ex.toString());
-        c.setReason(ex.getMessage());
+        c.setErrorName(e.toString());
+        c.setReason(e.getMessage());
         return c;
     }
 }
