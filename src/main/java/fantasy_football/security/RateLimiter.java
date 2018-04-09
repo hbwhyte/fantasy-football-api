@@ -17,12 +17,24 @@ public class RateLimiter {
     private TimeUnit timePeriod;
     //ExecutorService that resets semaphore to run after a set timePeriod
     private ScheduledExecutorService scheduler;
+    private long timeCreated;
+    private int timeAmount;
 
     // Constructor
-    private RateLimiter(int maxCalls, TimeUnit timePeriod) {
+    private RateLimiter(int maxCalls, int timeAmount, TimeUnit timeUnit) {
         this.semaphore = new Semaphore(maxCalls);
         this.maxCalls = maxCalls;
-        this.timePeriod = timePeriod;
+        this.timeAmount = timeAmount;
+        this.timePeriod = timeUnit;
+        this.timeCreated = System.currentTimeMillis();
+    }
+
+    public long getTimeCreated() {
+        return timeCreated;
+    }
+
+    public void setTimeCreated(long timeCreated) {
+        this.timeCreated = timeCreated;
     }
 
     /**
@@ -33,9 +45,9 @@ public class RateLimiter {
      * @param timePeriod How frequently the limit is reset
      * @return RateLimiter Object
      */
-    public static RateLimiter createRateLimiter(int maxCalls, TimeUnit timePeriod) {
+    public static RateLimiter createRateLimiter(int maxCalls, int timeAmount, TimeUnit timePeriod) {
         // Creates new RateLimiter object
-        RateLimiter rateLimiter = new RateLimiter(maxCalls, timePeriod);
+        RateLimiter rateLimiter = new RateLimiter(maxCalls, timeAmount, timePeriod);
         // Schedules reset timeline, based on given params
         rateLimiter.schedulePermitReplenishment();
         return rateLimiter;
@@ -51,10 +63,9 @@ public class RateLimiter {
         return semaphore.tryAcquire();
     }
 
-//    public void stop() {
-//        scheduler.shutdownNow();
-//    }
-
+    public void stop() {
+        scheduler.shutdownNow();
+    }
 
     /**
      * Sets the reset schedule for the API Limit. If you want to create
@@ -67,7 +78,7 @@ public class RateLimiter {
         scheduler = Executors.newScheduledThreadPool(1);
         scheduler.schedule(() -> {
             semaphore.release(maxCalls - semaphore.availablePermits());
-        }, 1, timePeriod);
-
+        }, timeAmount, timePeriod);
     }
+
 }

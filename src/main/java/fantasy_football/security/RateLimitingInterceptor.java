@@ -21,11 +21,12 @@ public class RateLimitingInterceptor extends HandlerInterceptorAdapter {
     // API limit refreshes every 1 timeUnit
     // For partial units e.g. 15 minutes, you need to adjust the schedulePermitReplenishment() method
     private TimeUnit timeUnit = TimeUnit.DAYS;
+    private int timeAmount = 1;
     // Number of API calls per TimeUnit
     private int limit = 200;
 
     public static final Logger LOG
-            = Logger.getLogger(String.valueOf(R ateLimitingInterceptor.class));
+            = Logger.getLogger(String.valueOf(RateLimitingInterceptor.class));
 
     private Map<String, RateLimiter> limiters = new ConcurrentHashMap<>();
 
@@ -44,14 +45,28 @@ public class RateLimitingInterceptor extends HandlerInterceptorAdapter {
 
         // If they exceeded their request limit, reject the request and throw CallsExceeded Exception
         if (!allowRequest) {
+            rateLimiter.stop();
+            rateLimiter.schedulePermitReplenishment();
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-            throw new CallsExceededException("Too many calls.");
+            throw new CallsExceededException("Too many calls. Maximum of " + limit +
+                    " API requests per " + timeAmount +" "+ timeUnit.toString().toLowerCase() +
+            ". "); // + calculateTimeRemaining(rateLimiter));
         }
         //response.addHeader("Rate-Limit-Limit", String.valueOf(limit));
 
         // If they have not exceeded their request limit, return true.
         return allowRequest;
     }
+
+//    private String calculateTimeRemaining(RateLimiter rateLimiter) {
+//
+//        long initTime = rateLimiter.getTimeCreated();
+//        long currentTime = System.currentTimeMillis();
+//        long resetLength = timeUnit.toMillis(1);
+//        long resetTime = resetLength - ((currentTime - initTime)%resetLength);
+//
+//        return "There are " + resetTime + " milliseconds remaining until you can make more calls.";
+//    }
 
     private RateLimiter getRateLimiter(String apiKey) {
         if (limiters.containsKey(apiKey)) {
@@ -63,7 +78,7 @@ public class RateLimitingInterceptor extends HandlerInterceptorAdapter {
                     return limiters.get(apiKey);
                 }
                 // Allows 200 calls per day
-                RateLimiter rateLimiter = createRateLimiter(limit, timeUnit);
+                RateLimiter rateLimiter = createRateLimiter(limit, timeAmount, timeUnit);
 
                 limiters.put(apiKey, rateLimiter);
                 return rateLimiter;
@@ -71,8 +86,8 @@ public class RateLimitingInterceptor extends HandlerInterceptorAdapter {
         }
     }
 
-//    @PreDestroy
-//    public void destroy() {
-//        // loop and finalize all limiters
-//    }
+    @PreDestroy
+    public void destroy() {
+        // loop and finalize all limiters
+    }
 }
